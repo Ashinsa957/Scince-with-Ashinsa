@@ -1,49 +1,67 @@
-:root {
-    --primary: #1e3a8a;
-    --primary-hover: #1d4ed8;
-    --accent: #0d9488;
-    --bg: #f8fafc;
-    --card-bg: #ffffff;
-    --text: #1e293b;
-    --border: #e2e8f0;
-    --danger: #ef4444;
-    --success: #22c55e;
-    --warning: #f59e0b;
-}
+තේරුණා. ලිපිගොනු කිහිපයක් භාවිතා කරනවා වෙනුවට, පිටු මාරුවීම (Page Navigation) ඇතුළු සියලුම දේවල් එකම පිටුවක් තුළ සිදුවන **Single Page Application (SPA)** ක්‍රමවේදයට මම මෙය සකසා දෙන්නම්.
 
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding: 20px; }
-.container { max-width: 1000px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-h1, h2, h3 { color: var(--primary); margin-bottom: 20px; text-align: center; }
-form { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
-input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
-button { background-color: var(--primary); color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
-button:hover { background-color: var(--primary-hover); }
-.nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-.tab-btn { background: #e2e8f0; color: var(--text); padding: 10px 15px; white-space: nowrap; }
-.tab-btn.active { background: var(--primary); color: white; }
-.tab-content { display: none; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: white; }
-.tab-content.active { display: block; }
-.status-banner { padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; text-align: center; }
-.status-pending { background-color: #fef3c7; color: #d97706; }
-.status-unpaid { background-color: #fee2e2; color: #dc2626; }
-.status-approved { background-color: #dcfce7; color: #16a34a; }
-.admin-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; }
-.data-list { list-style: none; }
-.data-list li { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-.btn-danger { background-color: var(--danger); }
-.btn-success { background-color: var(--success); }
-@media (min-width: 768px) { .admin-grid { grid-template-columns: 1fr 1fr; } }
+එවිට ඔබට අවශ්‍ය වන්නේ පහත දැක්වෙන සම්පූර්ණ කේතය එක් `index.html` ගොනුවකට (File) පමණක් ඇතුළත් කිරීමයි. මෙහි CSS, HTML සහ JavaScript (Firebase + EmailJS) යන සියල්ලම තනි කේතයක් ලෙස අන්තර්ගත කර ඇත.
+
+```html
 <!DOCTYPE html>
 <html lang="si">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science with Ashinsa - Login & Register</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Science with Ashinsa - LMS</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        /* ==================== CSS ==================== */
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --accent: #0d9488;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); line-height: 1.6; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        h1, h2, h3 { color: var(--primary); margin-bottom: 20px; text-align: center; }
+        form { display: flex; flex-direction: column; gap: 15px; max-width: 500px; margin: 0 auto; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+        button { background-color: var(--primary); color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+        button:hover { background-color: var(--primary-hover); }
+        
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { background: #e2e8f0; color: var(--text); padding: 10px 15px; white-space: nowrap; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-content { display: none; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: white; }
+        .tab-content.active { display: block; }
+        
+        .status-banner { padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; text-align: center; }
+        .status-pending { background-color: #fef3c7; color: #d97706; }
+        .status-unpaid { background-color: #fee2e2; color: #dc2626; }
+        .status-approved { background-color: #dcfce7; color: #16a34a; }
+        
+        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 30px; }
+        .data-list { list-style: none; }
+        .data-list li { padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        
+        .btn-danger { background-color: var(--danger); }
+        .btn-success { background-color: var(--success); }
+        
+        @media (min-width: 768px) { .admin-grid { grid-template-columns: 1fr 1fr; } }
+        
+        /* Pages */
+        .page-view { display: none; }
+        .page-view.active { display: block; }
+    </style>
 </head>
 <body>
-    <div class="container">
+
+    <div id="authPage" class="container page-view active">
         <h1>Science with Ashinsa</h1>
         
         <div id="loginSection">
@@ -53,7 +71,7 @@ button:hover { background-color: var(--primary-hover); }
                 <input type="password" id="loginPassword" placeholder="මුරපදය" required>
                 <button type="submit">Log In</button>
             </form>
-            <p style="text-align:center; margin-top:15px;">නවකයෙක්ද? <a href="#" onclick="toggleAuth(false)">මෙහි ලියාපදිංචි වන්න</a></p>
+            <p style="text-align:center; margin-top:15px;">නවකයෙක්ද? <a href="#" onclick="window.toggleAuth(false)">මෙහි ලියාපදිංචි වන්න</a></p>
         </div>
 
         <div id="registerSection" style="display:none;">
@@ -76,61 +94,36 @@ button:hover { background-color: var(--primary-hover); }
                 <input type="file" id="regPhoto" accept="image/*" required>
                 <button type="submit">ලියාපදිංචි වන්න</button>
             </form>
-            <p style="text-align:center; margin-top:15px;">ஏற்கனவே ගිණුමක් තිබේද? <a href="#" onclick="toggleAuth(true)">Log In වන්න</a></p>
+            <p style="text-align:center; margin-top:15px;">ஏற்கனவே ගිණුමක් තිබේද? <a href="#" onclick="window.toggleAuth(true)">Log In වන්න</a></p>
         </div>
     </div>
 
-    <script>
-        function toggleAuth(showLogin) {
-            document.getElementById('loginSection').style.display = showLogin ? 'block' : 'none';
-            document.getElementById('registerSection').style.display = showLogin ? 'none' : 'block';
-        }
-    </script>
-    <script type="module" src="app.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="si">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard - Science with Ashinsa</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
+    <div id="studentPage" class="container page-view">
         <header style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:15px; margin-bottom:20px;">
             <div>
                 <h2 id="welcomeName" style="text-align:left; margin:0;">ආයුබෝවන් දරුවා!</h2>
                 <span id="studentGrade" style="font-weight:bold; color:var(--accent);">ශ්‍රේණිය: -</span>
             </div>
-            <button id="logoutBtn" class="btn-danger" style="padding:8px 15px;">ඉවත් වන්න (Logout)</button>
+            <button class="logoutBtn btn-danger" style="padding:8px 15px;">ඉවත් වන්න (Logout)</button>
         </header>
 
         <div id="statusBanner" class="status-banner status-pending" style="display:none;">ඔබේ ගිණුම තවමත් ගුරුවරයා විසින් අනුමත කර නොමැත. අනුමත කළ පසු සියලු අංග විවෘත වේ.</div>
         <div id="paymentBanner" class="status-banner status-unpaid" style="display:none;">මෙම මාසය සඳහා පන්ති ගාස්තු ගෙවා නොමැත. කරුණාකර 'පන්ති ගාස්තු' ටැබ් එක හරහා රිසිට්පත යොමු කරන්න.</div>
 
         <div class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('links')">පන්ති ලින්ක්</button>
-            <button class="tab-btn" onclick="switchTab('recordings')">පැරණි රෙකෝඩින්</button>
-            <button class="tab-btn" onclick="switchTab('tutes')">ටියුට් (Tutes)</button>
-            <button class="tab-btn" onclick="switchTab('notices')">නිවේදන (Notices)</button>
-            <button class="tab-btn" onclick="switchTab('payments')">පන්ති ගාස්තු</button>
-            <button class="tab-btn" onclick="switchTab('profile')">මගේ Profile</button>
+            <button class="tab-btn active" onclick="window.switchTab('links')">පන්ති ලින්ක්</button>
+            <button class="tab-btn" onclick="window.switchTab('recordings')">පැරණි රෙකෝඩින්</button>
+            <button class="tab-btn" onclick="window.switchTab('tutes')">ටියුට් (Tutes)</button>
+            <button class="tab-btn" onclick="window.switchTab('notices')">නිවේදන (Notices)</button>
+            <button class="tab-btn" onclick="window.switchTab('payments')">පන්ති ගාස්තු</button>
+            <button class="tab-btn" onclick="window.switchTab('profile')">මගේ Profile</button>
         </div>
 
-        <div id="links" class="tab-content active">
-            <h3>ඉදිරි සජීවී පන්ති සබැඳි</h3><ul id="linksList" class="data-list"></ul>
-        </div>
-        <div id="recordings" class="tab-content">
-            <h3>පසුගිය පන්තිවල රෙකෝඩින් පිටපත</h3><ul id="recordingsList" class="data-list"></ul>
-        </div>
-        <div id="tutes" class="tab-content">
-            <h3>පන්ති නිබන්ධන සහ PDF ටියුට්</h3><ul id="tutesList" class="data-list"></ul>
-        </div>
-        <div id="notices" class="tab-content">
-            <h3>විශේෂ පන්ති නිවේදන</h3><ul id="noticesList" class="data-list"></ul>
-        </div>
+        <div id="links" class="tab-content active"><h3>ඉදිරි සජීවී පන්ති සබැඳි</h3><ul id="linksList" class="data-list"></ul></div>
+        <div id="recordings" class="tab-content"><h3>පසුගිය පන්තිවල රෙකෝඩින් පිටපත</h3><ul id="recordingsList" class="data-list"></ul></div>
+        <div id="tutes" class="tab-content"><h3>පන්ති නිබන්ධන සහ PDF ටියුට්</h3><ul id="tutesList" class="data-list"></ul></div>
+        <div id="notices" class="tab-content"><h3>විශේෂ පන්ති නිවේදන</h3><ul id="noticesList" class="data-list"></ul></div>
+        
         <div id="payments" class="tab-content">
             <h3>මාසික පන්ති ගාස්තු තහවුරු කිරීම</h3>
             <p style="margin-bottom:15px; color:var(--warning); font-weight:bold;">බැංකු තැන්පතු රිසිට්පතක් මෙතනින් අප්ලෝඩ් කර ගුරුවරයාගේ අනුමැතිය ලබා ගන්න.</p>
@@ -140,6 +133,7 @@ button:hover { background-color: var(--primary-hover); }
                 <button type="submit">රිසිට්පත යොමු කරන්න</button>
             </form>
         </div>
+        
         <div id="profile" class="tab-content">
             <h3>මගේ විස්තර යාවත්කාලීන කිරීම</h3>
             <form id="profileForm">
@@ -157,30 +151,11 @@ button:hover { background-color: var(--primary-hover); }
         </div>
     </div>
 
-    <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        }
-    </script>
-    <script type="module" src="app.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="si">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Science with Ashinsa</title>
-    <link rel="stylesheet" href="style.css">
-    
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-</head>
-<body>
-    <div class="container" style="max-width:1200px;">
-        <h1>Science with Ashinsa - ගුරු පාලක පැනලය</h1>
+    <div id="adminPage" class="container page-view" style="max-width:1200px;">
+        <header style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border); padding-bottom:15px; margin-bottom:20px;">
+            <h1 style="margin:0;">Science with Ashinsa - ගුරු පාලක පැනලය</h1>
+            <button class="logoutBtn btn-danger" style="padding:8px 15px;">ඉවත් වන්න (Logout)</button>
+        </header>
         
         <div class="admin-grid">
             <div style="border:1px solid var(--border); padding:15px; border-radius:8px;">
@@ -225,290 +200,299 @@ button:hover { background-color: var(--primary-hover); }
             </div>
         </div>
     </div>
-    <script type="module" src="app.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, onSnapshot, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCWzQuoww4GEsDeK9Pz8fe-d5_HEhR4bIc",
+            authDomain: "science-with-ashinsa.firebaseapp.com",
+            databaseURL: "https://science-with-ashinsa-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "science-with-ashinsa",
+            storageBucket: "science-with-ashinsa.firebasestorage.app",
+            messagingSenderId: "616450909215",
+            appId: "1:616450909215:web:e041df1677cdfb9e34212a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // --- UI View Controllers ---
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        };
+
+        window.toggleAuth = function(showLogin) {
+            document.getElementById('loginSection').style.display = showLogin ? 'block' : 'none';
+            document.getElementById('registerSection').style.display = showLogin ? 'none' : 'block';
+        };
+
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        };
+
+        // --- 1. Auth Routing ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                if (user.email === "ashinsasathsara@gmail.com") { 
+                    window.showPage('adminPage');
+                    loadAdminDashboard();
+                } else {
+                    window.showPage('studentPage');
+                    loadStudentDashboard(user);
+                }
+            } else {
+                window.showPage('authPage');
+            }
+        });
+
+        // --- 2. Login & Register ---
+        document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("regEmail").value;
+            const password = document.getElementById("regPassword").value;
+            const photoFile = document.getElementById("regPhoto").files[0];
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                await sendEmailVerification(user);
+                alert("ඔබේ ගිණුමට Verification ඊමේල් පණිවිඩයක් යොමු කර ඇත. කරුණාකර එය තහවුරු කරන්න.");
+
+                const storageRef = ref(storage, `profiles/${user.uid}`);
+                await uploadBytes(storageRef, photoFile);
+                const photoURL = await getDownloadURL(storageRef);
+
+                await setDoc(doc(db, "students", user.uid), {
+                    uid: user.uid,
+                    email: email, 
+                    name: document.getElementById("regName").value,
+                    grade: document.getElementById("regGrade").value,
+                    school: document.getElementById("regSchool").value,
+                    phone1: document.getElementById("regPhone1").value,
+                    phone2: document.getElementById("regPhone2").value,
+                    address: document.getElementById("regAddress").value,
+                    photoURL: photoURL,
+                    status: "pending",
+                    paymentStatus: "unpaid"
+                });
+
+                alert("ලියාපදිංචිය සාර්ථකයි! ගුරුතුමා අනුමත කළ පසු ඔබට ඊමේල් පණිවිඩයක් ලැබෙනු ඇත.");
+                await signOut(auth);
+            } catch (err) { alert("දෝෂයක් සිදුවිය: " + err.message); }
+        });
+
+        document.getElementById("loginForm")?.addEventListener("submit", (e) => {
+            e.preventDefault();
+            signInWithEmailAndPassword(auth, document.getElementById("loginEmail").value, document.getElementById("loginPassword").value)
+                .catch(err => alert("ඇතුල් වීම අසාර්ථකයි: " + err.message));
+        });
+
+        document.querySelectorAll(".logoutBtn").forEach(btn => {
+            btn.addEventListener("click", () => signOut(auth));
+        });
+
+        // --- 3. Student Dashboard Logic ---
+        async function loadStudentDashboard(user) {
+            const docRef = doc(db, "students", user.uid);
+            
+            onSnapshot(docRef, (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+
+                document.getElementById("welcomeName").innerText = `ආයුබෝවන් ${data.name}!`;
+                document.getElementById("studentGrade").innerText = `ශ්‍රේණිය: ${data.grade} වසර`;
+                document.getElementById("profileName").value = data.name;
+                document.getElementById("profileSchool").value = data.school;
+                document.getElementById("profilePhone").value = data.phone1;
+                document.getElementById("profileAddress").value = data.address;
+                document.getElementById("profilePreview").src = data.photoURL;
+
+                if (data.status === "pending") {
+                    document.getElementById("statusBanner").style.display = "block";
+                    return;
+                } else {
+                    document.getElementById("statusBanner").style.display = "none";
+                }
+
+                if (data.paymentStatus !== "paid") {
+                    document.getElementById("paymentBanner").style.display = "block";
+                    document.getElementById("linksList").innerHTML = `<li style="color:red; font-weight:bold;">පන්ති සබැඳි ලබා ගැනීමට කරුණාකර රිසිට්පත යොමු කරන්න.</li>`;
+                } else {
+                    document.getElementById("paymentBanner").style.display = "none";
+                    listenToItems("links", data.grade, "linksList");
+                }
+
+                listenToItems("recordings", data.grade, "recordingsList");
+                listenToItems("tutes", data.grade, "tutesList");
+                listenToItems("notices", data.grade, "noticesList");
+            });
+
+            document.getElementById("receiptForm").onsubmit = async (e) => {
+                e.preventDefault();
+                const month = document.getElementById("receiptMonth").value;
+                const file = document.getElementById("receiptFile").files[0];
+                
+                try {
+                    const rRef = ref(storage, `receipts/${user.uid}_${Date.now()}`);
+                    await uploadBytes(rRef, file);
+                    const rUrl = await getDownloadURL(rRef);
+
+                    await addDoc(collection(db, "receipts"), {
+                        studentId: user.uid,
+                        studentName: document.getElementById("profileName").value,
+                        month: month,
+                        receiptUrl: rUrl,
+                        status: "pending",
+                        uploadedAt: Date.now()
+                    });
+                    
+                    await updateDoc(doc(db, "students", user.uid), { paymentStatus: "pending" });
+                    alert("රිසිට්පත සාර්ථකව යොමු කරන ලදී. ගුරු අනුමැතියෙන් පසු ලින්ක් විවෘත වේ.");
+                } catch(err) { alert(err.message); }
+            };
+
+            document.getElementById("profileForm").onsubmit = async (e) => {
+                e.preventDefault();
+                const passwordPrompt = prompt("කරුණාකර ඔබගේ වත්මන් මුරපදය (Password) ඇතුළත් කරන්න:");
+                if (!passwordPrompt) return;
+
+                try {
+                    const credential = EmailAuthProvider.credential(user.email, passwordPrompt);
+                    await reauthenticateWithCredential(user, credential);
+
+                    let newPhotoUrl = document.getElementById("profilePreview").src;
+                    const fileInput = document.getElementById("profilePhoto").files[0];
+                    if (fileInput) {
+                        const pRef = ref(storage, `profiles/${user.uid}`);
+                        await uploadBytes(pRef, fileInput);
+                        newPhotoUrl = await getDownloadURL(pRef);
+                    }
+
+                    await updateDoc(doc(db, "students", user.uid), {
+                        name: document.getElementById("profileName").value,
+                        school: document.getElementById("profileSchool").value,
+                        phone1: document.getElementById("profilePhone").value,
+                        address: document.getElementById("profileAddress").value,
+                        photoURL: newPhotoUrl
+                    });
+                    alert("තොරතුරු සාර්ථකව යාවත්කාලීන කරන ලදී.");
+                } catch(err) { alert("වෙරිෆයි කිරීම අසාර්ථකයි! මුරපදය වැරදියි."); }
+            };
+        }
+
+        function listenToItems(collectionName, grade, elementId) {
+            const q = query(collection(db, collectionName), where("grade", "==", grade));
+            onSnapshot(q, (snapshot) => {
+                const listEl = document.getElementById(elementId);
+                if(!listEl) return;
+                listEl.innerHTML = "";
+                snapshot.forEach((doc) => {
+                    const item = doc.data();
+                    if(collectionName === "notices") {
+                        listEl.innerHTML += `<li><div><strong>${item.title}</strong></div></li>`;
+                    } else {
+                        listEl.innerHTML += `<li><div><strong>${item.title}</strong></div> <a href="${item.url}" target="_blank"><button style="padding:5px 10px;">විවෘත කරන්න</button></a></li>`;
+                    }
+                });
+            });
+        }
+
+        // --- 4. Admin Dashboard Logic ---
+        function loadAdminDashboard() {
+            onSnapshot(query(collection(db, "students"), where("status", "==", "pending")), (snap) => {
+                const list = document.getElementById("adminPendingStudents");
+                list.innerHTML = "";
+                snap.forEach(docSnap => {
+                    const s = docSnap.data();
+                    list.innerHTML += `<li>
+                        <img src="${s.photoURL}" style="width:40px;height:40px;border-radius:50%; object-fit:cover;">
+                        <div>${s.name} (${s.grade} වසර)</div>
+                        <button onclick="window.approveStudent('${s.uid}', '${s.email}', '${s.name}')" style="padding:4px 10px; background:#22c55e;">Approve</button>
+                    </li>`;
+                });
+            });
+
+            window.approveStudent = async (uid, studentEmail, studentName) => {
+                try {
+                    await updateDoc(doc(db, "students", uid), { status: "approved" });
+                    
+                    emailjs.send("service_puq5wvk", "YOUR_TEMPLATE_ID", {
+                        student_name: studentName,
+                        to_email: studentEmail,
+                        message: "ඔබගේ Science with Ashinsa ගිණුම ගුරුතුමා විසින් අනුමත කරන ලදී. දැන් ඔබට පද්ධතියට ලොග් විය හැක."
+                    }, "YOUR_PUBLIC_KEY").then(
+                        function(response) { alert("සිසුවා අනුමත කළ අතර ඊමේල් පණිවිඩයද සාර්ථකව යවන ලදී!"); },
+                        function(error) { alert("සිසුවා අනුමත විය. නමුත් ඊමේල් යැවීමේ දෝෂයක් මතු විය: " + error.text); }
+                    );
+                } catch (err) { alert("දෝෂයක්: " + err.message); }
+            };
+
+            onSnapshot(query(collection(db, "receipts"), where("status", "==", "pending")), (snap) => {
+                const list = document.getElementById("adminPendingPayments");
+                list.innerHTML = "";
+                snap.forEach(docSnap => {
+                    const r = docSnap.data();
+                    list.innerHTML += `<li>
+                        <div><strong>${r.studentName}</strong> (${r.month})</div>
+                        <a href="${r.receiptUrl}" target="_blank" style="color:blue;">රිසිට්පත බලන්න</a>
+                        <button onclick="window.approvePayment('${docSnap.id}', '${r.studentId}')" style="padding:4px 10px; background:#22c55e;">Confirm Payment</button>
+                    </li>`;
+                });
+            });
+
+            window.approvePayment = async (receiptId, studentId) => {
+                await updateDoc(doc(db, "receipts", receiptId), { status: "approved" });
+                await updateDoc(doc(db, "students", studentId), { paymentStatus: "paid" });
+                alert("ගෙවීම් තහවුරුයි! දරුවාට පන්ති ලින්ක් ස්වයංක්‍රීයව විවෘත විය.");
+            };
+
+            document.getElementById("adminUploadForm").onsubmit = async (e) => {
+                e.preventDefault();
+                const type = document.getElementById("uploadType").value;
+                await addDoc(collection(db, type), {
+                    title: document.getElementById("uploadTitle").value,
+                    url: document.getElementById("uploadUrl").value || "",
+                    grade: document.getElementById("uploadGrade").value,
+                    createdAt: Date.now()
+                });
+                alert("එසැනින් පද්ධතියට එක් කරන ලදී!");
+                document.getElementById("adminUploadForm").reset();
+            };
+
+            window.loadAdminData = () => {
+                const type = document.getElementById("viewType").value;
+                onSnapshot(collection(db, type), (snap) => {
+                    const list = document.getElementById("adminLiveItems");
+                    list.innerHTML = "";
+                    snap.forEach(docSnap => {
+                        list.innerHTML += `<li>
+                            <div>[${docSnap.data().grade} වසර] ${docSnap.data().title}</div>
+                            <button onclick="window.deleteItem('${type}', '${docSnap.id}')" class="btn-danger" style="padding:4px 8px;">Delete</button>
+                        </li>`;
+                    });
+                });
+            };
+            
+            window.deleteItem = async (collectionName, id) => {
+                if(confirm("මෙය පද්ධතියෙන් ඉවත් කිරීමට අවශ්‍යද?")) {
+                    await deleteDoc(doc(db, collectionName, id));
+                }
+            };
+            window.loadAdminData();
+        }
+    </script>
 </body>
 </html>
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, onSnapshot, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyCWzQuoww4GEsDeK9Pz8fe-d5_HEhR4bIc",
-    authDomain: "science-with-ashinsa.firebaseapp.com",
-    databaseURL: "https://science-with-ashinsa-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "science-with-ashinsa",
-    storageBucket: "science-with-ashinsa.firebasestorage.app",
-    messagingSenderId: "616450909215",
-    appId: "1:616450909215:web:e041df1677cdfb9e34212a""
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// ------------------ 1. පරිශීලක හඳුනාගැනීම (Routing) ------------------
-onAuthStateChanged(auth, async (user) => {
-    const path = window.location.pathname;
-    if (user) {
-        if (path.includes("index.html") || path === "/") {
-            // ගුරුතුමාගේ Email ලිපිනය පරීක්ෂා කිරීම
-            if (user.email === "ashinsasathsara@gmail.com") { 
-                window.location.href = "admin.html";
-            } else {
-                window.location.href = "student.html";
-            }
-        }
-        if (path.includes("student.html")) loadStudentDashboard(user);
-    } else {
-        if (path.includes("student.html") || path.includes("admin.html")) {
-            window.location.href = "index.html";
-        }
-    }
-});
-
-// ------------------ 2. ලියාපදිංචි වීම සහ LOGIN ------------------
-document.getElementById("registerForm")?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("regEmail").value;
-    const password = document.getElementById("regPassword").value;
-    const photoFile = document.getElementById("regPhoto").files[0];
-
-    try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        await sendEmailVerification(user);
-        alert("ඔබේ ගිණුමට Verification ඊමේල් පණිවිඩයක් යොමු කර ඇත. කරුණාකර එය තහවුරු කරන්න.");
-
-        const storageRef = ref(storage, `profiles/${user.uid}`);
-        await uploadBytes(storageRef, photoFile);
-        const photoURL = await getDownloadURL(storageRef);
-
-        // Email එකත් සමඟ දත්ත ගබඩා කිරීම (EmailJS සඳහා මෙය අවශ්‍ය වේ)
-        await setDoc(doc(db, "students", user.uid), {
-            uid: user.uid,
-            email: email, 
-            name: document.getElementById("regName").value,
-            grade: document.getElementById("regGrade").value,
-            school: document.getElementById("regSchool").value,
-            phone1: document.getElementById("regPhone1").value,
-            phone2: document.getElementById("regPhone2").value,
-            address: document.getElementById("regAddress").value,
-            photoURL: photoURL,
-            status: "pending",
-            paymentStatus: "unpaid"
-        });
-
-        alert("ලියාපදිංචිය සාර්ථකයි! ගුරුතුමා අනුමත කළ පසු ඔබට ඊමේල් පණිවිඩයක් ලැබෙනු ඇත.");
-        await signOut(auth);
-        window.location.reload();
-    } catch (err) { alert("දෝෂයක් සිදුවිය: " + err.message); }
-});
-
-document.getElementById("loginForm")?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    signInWithEmailAndPassword(auth, document.getElementById("loginEmail").value, document.getElementById("loginPassword").value)
-        .catch(err => alert("ඇතුල් වීම අසාර්ථකයි: " + err.message));
-});
-
-document.getElementById("logoutBtn")?.addEventListener("click", () => signOut(auth));
-
-// ------------------ 3. දරුවන්ගේ පැනලය (Live Updates) ------------------
-async function loadStudentDashboard(user) {
-    const docRef = doc(db, "students", user.uid);
-    
-    onSnapshot(docRef, (docSnap) => {
-        if (!docSnap.exists()) return;
-        const data = docSnap.data();
-
-        document.getElementById("welcomeName").innerText = `ආයුබෝවන් ${data.name}!`;
-        document.getElementById("studentGrade").innerText = `ශ්‍රේණිය: ${data.grade} වසර`;
-        document.getElementById("profileName").value = data.name;
-        document.getElementById("profileSchool").value = data.school;
-        document.getElementById("profilePhone").value = data.phone1;
-        document.getElementById("profileAddress").value = data.address;
-        document.getElementById("profilePreview").src = data.photoURL;
-
-        if (data.status === "pending") {
-            document.getElementById("statusBanner").style.display = "block";
-            return;
-        } else {
-            document.getElementById("statusBanner").style.display = "none";
-        }
-
-        if (data.paymentStatus !== "paid") {
-            document.getElementById("paymentBanner").style.display = "block";
-            document.getElementById("linksList").innerHTML = `<li style="color:red; font-weight:bold;">පන්ති සබැඳි ලබා ගැනීමට කරුණාකර රිසිට්පත යොමු කරන්න.</li>`;
-        } else {
-            document.getElementById("paymentBanner").style.display = "none";
-            listenToItems("links", data.grade, "linksList");
-        }
-
-        listenToItems("recordings", data.grade, "recordingsList");
-        listenToItems("tutes", data.grade, "tutesList");
-        listenToItems("notices", data.grade, "noticesList");
-    });
-
-    document.getElementById("receiptForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const month = document.getElementById("receiptMonth").value;
-        const file = document.getElementById("receiptFile").files[0];
-        
-        try {
-            const rRef = ref(storage, `receipts/${user.uid}_${Date.now()}`);
-            await uploadBytes(rRef, file);
-            const rUrl = await getDownloadURL(rRef);
-
-            await addDoc(collection(db, "receipts"), {
-                studentId: user.uid,
-                studentName: document.getElementById("profileName").value,
-                month: month,
-                receiptUrl: rUrl,
-                status: "pending",
-                uploadedAt: Date.now()
-            });
-            
-            await updateDoc(doc(db, "students", user.uid), { paymentStatus: "pending" });
-            alert("රිසිට්පත සාර්ථකව යොමු කරන ලදී. ගුරු අනුමැතියෙන් පසු ලින්ක් විවෘත වේ.");
-        } catch(err) { alert(err.message); }
-    });
-
-    document.getElementById("profileForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const passwordPrompt = prompt("කරුණාකර ඔබගේ වත්මන් මුරපදය (Password) ඇතුළත් කරන්න:");
-        if (!passwordPrompt) return;
-
-        try {
-            const credential = EmailAuthProvider.credential(user.email, passwordPrompt);
-            await reauthenticateWithCredential(user, credential);
-
-            let newPhotoUrl = document.getElementById("profilePreview").src;
-            const fileInput = document.getElementById("profilePhoto").files[0];
-            if (fileInput) {
-                const pRef = ref(storage, `profiles/${user.uid}`);
-                await uploadBytes(pRef, fileInput);
-                newPhotoUrl = await getDownloadURL(pRef);
-            }
-
-            await updateDoc(doc(db, "students", user.uid), {
-                name: document.getElementById("profileName").value,
-                school: document.getElementById("profileSchool").value,
-                phone1: document.getElementById("profilePhone").value,
-                address: document.getElementById("profileAddress").value,
-                photoURL: newPhotoUrl
-            });
-            alert("තොරතුරු සාර්ථකව යාවත්කාලීන කරන ලදී.");
-        } catch(err) { alert("වෙරිෆයි කිරීම අසාර්ථකයි! මුරපදය වැරදියි."); }
-    });
-}
-
-function listenToItems(collectionName, grade, elementId) {
-    const q = query(collection(db, collectionName), where("grade", "==", grade));
-    onSnapshot(q, (snapshot) => {
-        const listEl = document.getElementById(elementId);
-        if(!listEl) return;
-        listEl.innerHTML = "";
-        snapshot.forEach((doc) => {
-            const item = doc.data();
-            if(collectionName === "notices") {
-                listEl.innerHTML += `<li><div><strong>${item.title}</strong></div></li>`;
-            } else {
-                listEl.innerHTML += `<li><div><strong>${item.title}</strong></div> <a href="${item.url}" target="_blank"><button style="padding:5px 10px;">විවෘත කරන්න</button></a></li>`;
-            }
-        });
-    });
-}
-
-// ------------------ 4. ගුරු පාලක පැනලය (Admin with EmailJS) ------------------
-if (window.location.pathname.includes("admin.html")) {
-    
-    // නව සිසුන් අනුමත කිරීම
-    onSnapshot(query(collection(db, "students"), where("status", "==", "pending")), (snap) => {
-        const list = document.getElementById("adminPendingStudents");
-        list.innerHTML = "";
-        snap.forEach(docSnap => {
-            const s = docSnap.data();
-            list.innerHTML += `<li>
-                <img src="${s.photoURL}" style="width:40px;height:40px;border-radius:50%; object-fit:cover;">
-                <div>${s.name} (${s.grade} වසර)</div>
-                <button onclick="approveStudent('${s.uid}', '${s.email}', '${s.name}')" style="padding:4px 10px; background:#22c55e;">Approve</button>
-            </li>`;
-        });
-    });
-
-    window.approveStudent = async (uid, studentEmail, studentName) => {
-        try {
-            // 1. ගිණුම අනුමත කිරීම
-            await updateDoc(doc(db, "students", uid), { status: "approved" });
-            
-            // 2. EmailJS හරහා පණිවිඩය යැවීම
-            emailjs.send("service_puq5wvk", "YOUR_TEMPLATE_ID", {
-                student_name: studentName,
-                to_email: studentEmail,
-                message: "ඔබගේ Science with Ashinsa ගිණුම ගුරුතුමා විසින් අනුමත කරන ලදී. දැන් ඔබට පද්ධතියට ලොග් විය හැක."
-            }, "YOUR_PUBLIC_KEY").then(
-                function(response) { alert("සිසුවා අනුමත කළ අතර ඊමේල් පණිවිඩයද සාර්ථකව යවන ලදී!"); },
-                function(error) { alert("සිසුවා අනුමත විය. නමුත් ඊමේල් යැවීමේ දෝෂයක් මතු විය: " + error.text); }
-            );
-
-        } catch (err) {
-            alert("දෝෂයක්: " + err.message);
-        }
-    };
-
-    // බැංකු රිසිට්පත් පරීක්ෂාව
-    onSnapshot(query(collection(db, "receipts"), where("status", "==", "pending")), (snap) => {
-        const list = document.getElementById("adminPendingPayments");
-        list.innerHTML = "";
-        snap.forEach(docSnap => {
-            const r = docSnap.data();
-            list.innerHTML += `<li>
-                <div><strong>${r.studentName}</strong> (${r.month})</div>
-                <a href="${r.receiptUrl}" target="_blank" style="color:blue;">රිසිට්පත බලන්න</a>
-                <button onclick="approvePayment('${docSnap.id}', '${r.studentId}')" style="padding:4px 10px; background:#22c55e;">Confirm Payment</button>
-            </li>`;
-        });
-    });
-
-    window.approvePayment = async (receiptId, studentId) => {
-        await updateDoc(doc(db, "receipts", receiptId), { status: "approved" });
-        await updateDoc(doc(db, "students", studentId), { paymentStatus: "paid" });
-        alert("ගෙවීම් තහවුරුයි! දරුවාට පන්ති ලින්ක් ස්වයංක්‍රීයව විවෘත විය.");
-    };
-
-    // දත්ත එකතු කිරීම
-    document.getElementById("adminUploadForm")?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const type = document.getElementById("uploadType").value;
-        await addDoc(collection(db, type), {
-            title: document.getElementById("uploadTitle").value,
-            url: document.getElementById("uploadUrl").value || "",
-            grade: document.getElementById("uploadGrade").value,
-            createdAt: Date.now()
-        });
-        alert("එසැනින් පද්ධතියට එක් කරන ලදී!");
-        document.getElementById("adminUploadForm").reset();
-    });
-
-    window.loadAdminData = () => {
-        const type = document.getElementById("viewType").value;
-        onSnapshot(collection(db, type), (snap) => {
-            const list = document.getElementById("adminLiveItems");
-            list.innerHTML = "";
-            snap.forEach(docSnap => {
-                list.innerHTML += `<li>
-                    <div>[${docSnap.data().grade} වසර] ${docSnap.data().title}</div>
-                    <button onclick="deleteItem('${type}', '${docSnap.id}')" class="btn-danger" style="padding:4px 8px;">Delete</button>
-                </li>`;
-            });
-        });
-    };
-    window.deleteItem = async (collectionName, id) => {
-        if(confirm("මෙය පද්ධතියෙන් ඉවත් කිරීමට අවශ්‍යද?")) {
-            await deleteDoc(doc(db, collectionName, id));
-        }
-    };
-    window.loadAdminData();
-} 
+```
